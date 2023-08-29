@@ -1,0 +1,19 @@
+#navbarWrapper{
+  background: #f4f5f6;
+  padding:15px;
+  
+}
+#navbarCont{
+  display: flex;
+  flex-wrap: wrap;
+  color: #808893;
+}
+#navbarCont div{
+  align-self: center;
+}
+#title{
+  padding-left: 25px;;
+}
+#devName{
+  margin-left: auto;
+}

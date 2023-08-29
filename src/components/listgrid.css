@@ -1,0 +1,35 @@
+#listgridWrapper{padding:15px;}
+
+.deviceRecord{
+  padding:15px;
+  border-top:1px solid #f4f5f6;
+  color: #808080;
+  justify-content: left;
+  width: 100%;
+}
+#listgridCont{
+  max-height: 800px;
+  height: 100%;
+  overflow: scroll;
+  overflow-x: hidden;
+}
+.imgtd{
+  width: 50px;
+}
+table{
+  width: 100%;
+}
+th{
+  text-align: left;
+  width: 48%;
+}
+td{
+  border-top:1px solid #f4f5f6;
+}
+tr{
+  width: 100%;
+}
+.linetd{
+  width: 48%;
+  text-align: left;
+}
