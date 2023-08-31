@@ -1,0 +1,52 @@
+#optionbarCont{
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 35px;
+  color: #808893;;
+}
+.search-bar{
+  position: relative;
+}
+.search-bar input{
+  width: 300px;
+}
+.searchIcon{
+  position: absolute;
+  left: 10px;
+  top: 8px;
+}
+
+#optionbarCont div{
+  align-self: center;
+
+}
+.optionLeft{
+  display: flex;
+  
+}
+.deviceCount{
+  font-size: 12px;
+  margin-left: 30px;;
+}
+.optionLeft input{
+  padding: 10px;
+  background: #f6f6f5;
+  border: none;
+  padding-left:35px;
+  border-radius: 5px;
+}
+.optionRight{
+  margin-left: auto;
+  display: flex;
+}
+
+.optionRight img{
+  margin-right:20px;
+  padding:5px;
+  border-radius: 5px;
+}
+.optionRight img:hover{
+  cursor: pointer;
+  background: #f4f5f6;
+  transition: background .5s;
+}

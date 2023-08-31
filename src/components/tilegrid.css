@@ -1,0 +1,59 @@
+#tileGridCont{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+}
+
+.tileBox{
+  margin:10px;
+  width: 250px;
+  border-radius: 5px;
+  border: 1px solid #ededf0;
+  cursor: pointer;
+  background: white;
+  transition: background .5;
+}
+.tileBoxTop{
+  position: relative;
+  background:#fafafa;
+  padding:10px;
+  transition: background .5;
+}
+.tileBoxTop img{
+  height: 84px;
+}
+.tileBadge{
+  right: 0;
+  top: 0;
+  color:#006fff;
+  position: absolute;
+  padding:5px;
+  border-radius: 5px;
+  font-size: 12px;
+  background: white;
+}
+.tileBox:hover .tileBoxTop{
+  background:#f4f5f6;
+  transition: background .5s;
+}
+
+.tileBox .tileBoxBottom{
+  padding:10px;
+  transition: background .5s;
+}
+.tileBox:hover{
+  background: #f9fafa;
+  transition: background .5s;
+}
+.shortnames{
+  font-size: 13px;
+  color: #8c8c8c;
+}
+.productName{
+  text-align: left;
+  padding-bottom: 30px;
+}
+
+.shortnameBox,.shortnames{
+  text-align: left;
+}

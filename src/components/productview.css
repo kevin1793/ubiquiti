@@ -1,0 +1,38 @@
+#productCont{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top:30px;
+}
+.prodRight{
+  max-width: 400px;
+  width: 100%;
+}
+.prodLeft{
+  background:#f9fafa;
+  padding:40px 30px;
+  margin-right: 50px;
+  border-radius: 5px;
+}
+.prodLine{
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;;
+}
+
+.prodTitle{
+  font-weight: bold;
+  font-size: 25px;
+  text-align: left;
+  margin-bottom: 5px;;
+}
+
+.prodSmallText{
+  text-align: left;
+  font-size: 12px;
+  margin-bottom: 30px;
+  color: #8c8c8c;
+}
+.prodRightText{
+  color: #8c8c8c;
+}
