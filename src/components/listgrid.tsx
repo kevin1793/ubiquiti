@@ -29,6 +29,7 @@ function Listgrid({toList}: listGridProps){
   async function loadData(){
     var data = localStorage.getItem('data');
     var parsedData = data?JSON.parse(data):'';
+    console.log('loading data LISTGRID',parsedData)
     setDevices(parsedData); 
   }
   return (

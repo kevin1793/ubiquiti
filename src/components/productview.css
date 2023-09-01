@@ -1,3 +1,45 @@
+/* PRODUCT BAR */
+.prodBarCont{
+  display: flex;
+  justify-content: space-between;
+  padding: 30px 35px;
+}
+
+.prodBarCont .button{
+  padding: 5px;
+  background-color: white;
+  border: none;
+  box-shadow: 3px 3px 10px #dad9d9;
+  color: #8c8c8c;
+  border-radius: 5px;
+  align-self: center;
+  cursor: pointer;
+  transition: background .5s;
+}
+
+.prodBarCont .button:hover{
+  background-color: #f4f5f6;
+}
+
+.prodBarRight{
+  display: flex;
+}
+.prodBarRight .button{
+  margin-left: 20px;
+  padding: 2px 5px;
+  padding-top:5px;
+}
+.backButton{
+  display: flex;
+}
+
+.backButton div{
+  display: flex;
+}
+.button img{
+  align-self: center;
+}
+
 #productCont{
   display: flex;
   flex-wrap: wrap;
@@ -9,15 +51,23 @@
   width: 100%;
 }
 .prodLeft{
-  background:#f9fafa;
-  padding:40px 30px;
   margin-right: 50px;
+}
+.prodImageHolder{
   border-radius: 5px;
+
+  padding:40px 30px;
+  background:#f9fafa;
+}
+.prodPlaceholderImg{
+  background:#f9fafa;
+  height: 257px;
+  height: 257px;
 }
 .prodLine{
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;;
+  margin-bottom: 17px;;
 }
 
 .prodTitle{
@@ -35,4 +85,32 @@
 }
 .prodRightText{
   color: #8c8c8c;
+}
+.jsonDetails{
+  max-width: 800px;
+  display: block;
+  margin:0 auto;
+}
+.jsonCont button{
+  cursor: pointer;
+  text-align: left;
+  color: #006fff;
+  background: none;
+  padding:5px 1px;
+  border: 1px solid #fff;
+  border-radius: 5px;
+}
+.jsonCont{
+  padding-bottom: 30px;;
+
+  text-align: left;
+}
+.jsonCont button:hover{
+  color: #0059cc;
+}
+.jsonCont button:focus{
+  border: 1px solid #0059cc;
+}
+.jsonDetailsCont{
+  width: 100%;
 }

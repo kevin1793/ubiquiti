@@ -13,10 +13,7 @@ function Tilegrid({toTile}: tileGridProps){
     if(!devices.length){
       console.log("loaded");
       loadData();
-    }else{
-      console.log('devices',devices);
-      console.log('devices local',localStorage.getItem('data'))
-    } 
+    }
   });
   const sendMessageToParent = (x:any) => {
     toTile(x); // Use the appropriate value here
@@ -24,13 +21,24 @@ function Tilegrid({toTile}: tileGridProps){
   };
 
   async function loadData(){
-    var data = localStorage.getItem('data');
-    var parsedData = data?JSON.parse(data):'';
-    console.log('parsed data',parsedData);
-    setDevices(parsedData); 
+    if(!localStorage.getItem('data')){
+      fetchData();
+    }else{
+      var data = localStorage.getItem('data');
+      var parsedData = data?JSON.parse(data):'';
+      setDevices(parsedData);
+    }
   }
   function recordClicked(device:any){
     sendMessageToParent({record:device});
+  }
+  async function fetchData(){
+    console.log('LOAD DATA APP');
+    var data = await fetch('https://static.ui.com/fingerprint/ui/public.json');
+    const res = await data.json();
+    console.log(res);
+    localStorage.setItem('data',JSON.stringify(res.devices));
+    setDevices(res.devices);
   }
   return (
     <div id="tileGridWrapper">

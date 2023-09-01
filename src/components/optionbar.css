@@ -2,7 +2,8 @@
   display: flex;
   justify-content: space-between;
   padding: 20px 35px;
-  color: #808893;;
+  color: #808893;
+  flex-wrap: wrap;
 }
 .search-bar{
   position: relative;
