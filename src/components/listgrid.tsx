@@ -3,18 +3,39 @@ import "./../components/listgrid.css"
 
 interface listGridProps {
   toList: (message: object) => void;
+  updateList: (message: object) => void;
+
 }
 
-function Listgrid({toList}: listGridProps){
+
+function Listgrid({toList,updateList}: listGridProps){
   const [devices, setDevices] = useState([]);
-  var devs:any = [];
+  const [allDevices, setAllDevices] = useState([]);
+  const [search, setSearch] = useState('');
   useEffect(() => {
+    console.log('START LISTGRID');
     // call api or anything
+    console.log('updateList LIST',JSON.stringify(search));
+    console.log('local search',JSON.stringify(localStorage.getItem('search')));
+    if(localStorage.getItem('search') != search){
+      var localSearch = localStorage.getItem('search');
+
+      if(localSearch === ''){
+        setDevices(allDevices);
+        setSearch(localSearch?localSearch:'');
+        return;
+      }
+      console.log('search',localStorage.getItem('search'));
+      setAllDevices(devices);
+      var filteredDevices:any = allDevices.filter((x:any) => (x.product?.name).toLowerCase().includes(localSearch));
+      setDevices(filteredDevices?filteredDevices:[]);
+      setSearch(localSearch?localSearch:'');
+      console.log('devices length',devices.length);
+    }
     if(!devices.length){
       console.log("loaded");
       loadData();
-    }else{
-    } 
+    }
   });
 
   function recordClicked(x:any){
@@ -27,10 +48,23 @@ function Listgrid({toList}: listGridProps){
   };
 
   async function loadData(){
-    var data = localStorage.getItem('data');
-    var parsedData = data?JSON.parse(data):'';
-    console.log('loading data LISTGRID',parsedData)
-    setDevices(parsedData); 
+    if(!localStorage.getItem('data')){
+      fetchData();
+    }else{
+      var data = localStorage.getItem('data');
+      var parsedData = data?JSON.parse(data):'';
+      setDevices(parsedData);
+      setAllDevices(parsedData);
+    }
+  }
+  async function fetchData(){
+    console.log('LOAD DATA APP');
+    var data = await fetch('https://static.ui.com/fingerprint/ui/public.json');
+    const res = await data.json();
+    console.log(res);
+    localStorage.setItem('data',JSON.stringify(res.devices));
+    setDevices(res.devices);
+    setAllDevices(res.devices);
   }
   return (
     <div id="listgridWrapper">

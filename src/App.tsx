@@ -19,15 +19,15 @@ function App() {
   const [view, setView] = useState<string>('list');
   const [record, setRecord] = useState<Record>({line:{}});
   const [lastView, setLastView] = useState<string>('list');
-  
+  const [searchValue, setSearchValue] = useState<string>('list');
+  const [listData, setListData] = useState('');
 
-  var listData = [];
   useEffect(() => {
     console.log("loaded");
     console.log(localStorage.getItem('view'));
     loadData();
 
-    console.log('view',view);
+    console.log('APP view',view);
     if(localStorage.getItem('view')){
       var localView = localStorage.getItem('view')?localStorage.getItem('view'):'';
       setView(localView?localView:'');
@@ -46,6 +46,10 @@ function App() {
     if(message.view){
       localStorage.setItem('view',message.view);
       setView(message.view);
+    }else if(message.search || message.search === ''){
+      localStorage.setItem('search',message.search);
+      setSearchValue(message.search);
+      console.log('searchValue',searchValue);
     }
   }
 
@@ -71,6 +75,9 @@ function App() {
       localStorage.setItem('record',JSON.stringify(message.record));
     }
   }
+  const updateListData = (newData:any) => {
+    setListData(newData);
+  };
 
   const fromProduct = (message:any) => {
     console.log('MESSAGE FROM PRODUCT',message);
@@ -91,7 +98,6 @@ function App() {
     const res = await data.json();
     console.log(res);
     localStorage.setItem('data',JSON.stringify(res.devices));
-    listData = res.devices;
   }
 
   return (
@@ -109,7 +115,7 @@ function App() {
 
       }
       {view == 'list'?
-      <Listgrid toList={fromList}></Listgrid>
+      <Listgrid toList={fromList} updateList={updateListData}></Listgrid>
       :
       view == 'tile'?
       <Tilegrid toTile={fromTile}></Tilegrid>

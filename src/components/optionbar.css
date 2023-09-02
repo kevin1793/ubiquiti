@@ -41,13 +41,25 @@
   display: flex;
 }
 
-.optionRight img{
-  margin-right:20px;
-  padding:5px;
-  border-radius: 5px;
-}
-.optionRight img:hover{
+.optionRight button:hover{
   cursor: pointer;
   background: #f4f5f6;
+}
+.optionRight button{
+  border: 1px #fff solid;
+  border-radius: 5px;
+  margin-right:20px;
+  padding:2px 5px;
+  padding-top: 4px;
+  background: none;
   transition: background .5s;
+
+}
+.optionRight button:focus{
+  border: 1px #006fff solid;
+  border-radius: 5px;
+  background: #f4f5f6;
+}
+.optionRight button:focus:hover{
+  background: #f4f5f6;
 }

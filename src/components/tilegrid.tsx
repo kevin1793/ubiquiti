@@ -8,8 +8,9 @@ interface tileGridProps {
 function Tilegrid({toTile}: tileGridProps){
   const [devices, setDevices] = useState([]);
   useEffect(() => {
+
     // call api or anything
-    console.log('DATA?',localStorage.getItem('data'))
+    console.log('TILE GRID DATA?',localStorage.getItem('data'))
     if(!devices.length){
       console.log("loaded");
       loadData();
