@@ -13,26 +13,29 @@ function Listgrid({toList,updateList}: listGridProps){
   const [allDevices, setAllDevices] = useState([]);
   const [search, setSearch] = useState('');
   useEffect(() => {
-    console.log('START LISTGRID');
+    console.log('===START LISTGRID===');
     // call api or anything
+    console.log('DEVICES length', devices.length);
+    console.log('ALL DEVICES length', allDevices.length);
     console.log('updateList LIST',JSON.stringify(search));
     console.log('local search',JSON.stringify(localStorage.getItem('search')));
-    if(localStorage.getItem('search') != search){
+
+    if(allDevices.length && localStorage.getItem('search') != search){
       var localSearch = localStorage.getItem('search');
 
-      if(localSearch === ''){
+      if(localSearch == ''){
         setDevices(allDevices);
         setSearch(localSearch?localSearch:'');
         return;
       }
       console.log('search',localStorage.getItem('search'));
-      setAllDevices(devices);
       var filteredDevices:any = allDevices.filter((x:any) => (x.product?.name).toLowerCase().includes(localSearch));
-      setDevices(filteredDevices?filteredDevices:[]);
+      console.log('FILTERED DEVIECS',filteredDevices.length);
+      setDevices(filteredDevices.length?filteredDevices:[]);
       setSearch(localSearch?localSearch:'');
       console.log('devices length',devices.length);
     }
-    if(!devices.length){
+    if(!allDevices.length){
       console.log("loaded");
       loadData();
     }
@@ -86,7 +89,7 @@ function Listgrid({toList,updateList}: listGridProps){
             </tr>
           ))
           :
-          'NONE'
+          ''
           }
         </table>
         
