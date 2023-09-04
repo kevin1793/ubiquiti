@@ -10,6 +10,12 @@
 }
 .search-bar input{
   width: 300px;
+  box-shadow: none !important;
+}
+.search-bar input:focus-visible,.search-bar input:focus,.search-bar input:active{
+  border: 1px #006fff solid;
+  box-shadow: none;
+  outline: none;
 }
 .searchIcon{
   position: absolute;
@@ -31,8 +37,8 @@
 }
 .optionLeft input{
   padding: 10px;
+  border: 1px #fff solid;
   background: #f6f6f5;
-  border: none;
   padding-left:35px;
   border-radius: 5px;
 }
@@ -53,13 +59,52 @@
   padding-top: 4px;
   background: none;
   transition: background .5s;
-
+  color: #808893;
 }
 .optionRight button:focus{
   border: 1px #006fff solid;
   border-radius: 5px;
+  color: #006fff;
   background: #f4f5f6;
 }
 .optionRight button:focus:hover{
   background: #f4f5f6;
+}
+#filterCont{
+  position: relative;
+  width: fit-content;
+}
+#filterDropBox{
+  position: absolute;
+  width: 130px;
+  z-index: 100;
+  text-align: left;
+  padding:10px;
+  border-radius: 5px;
+  box-shadow: 5px 5px 10px #c8c8c9;
+  left: -70px;
+  top:30px;
+  background-color: white;
+}
+
+#filterDropBox label{
+  display: block;
+  padding-bottom: 7px;
+  padding-left: 3px;
+}
+label input{
+  margin-right: 7px;
+}
+.filterDropBoxTitle{
+  margin-bottom: 10px;
+  color:#222;
+  padding-left: 5px;
+  font-weight: 600;
+}
+.filterDropBoxReset{
+  margin-bottom: 10px;
+  color:#f03a3e;
+  cursor: pointer;
+  padding-left: 5px;
+  font-weight: 600;
 }

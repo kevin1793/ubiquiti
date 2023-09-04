@@ -10,39 +10,71 @@ interface listGridProps {
 
 function Listgrid({toList,updateList}: listGridProps){
   const [devices, setDevices] = useState([]);
+  const [filteredDevices, setFilteredDevices] = useState([]);
+  const [selectedFilter, setSelectedFilter] = useState([]);
   const [allDevices, setAllDevices] = useState([]);
   const [search, setSearch] = useState('');
   useEffect(() => {
-    console.log('===START LISTGRID===');
-    // call api or anything
-    console.log('DEVICES length', devices.length);
-    console.log('ALL DEVICES length', allDevices.length);
-    console.log('updateList LIST',JSON.stringify(search));
-    console.log('local search',JSON.stringify(localStorage.getItem('search')));
-
-    if(allDevices.length && localStorage.getItem('search') != search){
-      var localSearch = localStorage.getItem('search');
-
-      if(localSearch == ''){
-        setDevices(allDevices);
-        setSearch(localSearch?localSearch:'');
-        return;
-      }
-      console.log('search',localStorage.getItem('search'));
-      var filteredDevices:any = allDevices.filter((x:any) => (x.product?.name).toLowerCase().includes(localSearch));
-      console.log('FILTERED DEVIECS',filteredDevices.length);
-      setDevices(filteredDevices.length?filteredDevices:[]);
-      setSearch(localSearch?localSearch:'');
-      console.log('devices length',devices.length);
-    }
+    var localSearch:any = localStorage.getItem('search');
+    console.log('===LISRTTGRID======================================');
+    var localFilter:any = localStorage.getItem('selectedProductFilter');
+    var parsedFilter = JSON.parse(localFilter);
+    console.log('SEARCH',search,localSearch);
+    
+    // console.log('PARSED FILTER',parsedFilter);
+    console.log('alllDevices',allDevices.length);
     if(!allDevices.length){
       console.log("loaded");
-      loadData();
+      fetchData();
+    }
+    // SEACHCHANGED
+    if(localSearch != search){
+      if(!localSearch.length){
+        setFilteredDevices(allDevices);
+      }
+      console.log('localSearch',localSearch);
+      console.log('search',search);
+      setSearch(localSearch);
+      filterData(filteredDevices,localSearch);
+    }
+    // FILTERCHANGED
+    if(selectedFilter.length != parsedFilter.length){
+      setSelectedFilter(parsedFilter);
+      console.log('FILTERCHANGED',parsedFilter,selectedFilter);
+      getFilteredDevices(parsedFilter);
     }
   });
 
+  function getFilteredDevices(parsedFilter:any){
+    var filteredDevicesByProducts:any = allDevices;
+    if(parsedFilter?.length){
+      console.log('parsedFilter.length');
+      filteredDevicesByProducts = allDevices.filter((x:any) => parsedFilter.includes(x.line.name));
+    }
+    setFilteredDevices(filteredDevicesByProducts);
+    filterData(filteredDevicesByProducts,search);
+  }
+
+  function filterData(arr:any,val:any){
+    var parsedData:any = selectedFilter;
+    if(!val?.length){
+      console.log('filterData')
+      console.log('SET DEVICES localSearch',devices,filteredDevices);
+      
+      // var filteredDevicesByProducts = allDevices.filter((x:any) => parsedData.includes(x.line.name));
+      setDevices(arr);
+      return;
+    }
+    var filteredDevicesByProducts = allDevices.filter((x:any) => parsedData.includes(x.line.name));
+    var filteredDevs:any = filteredDevicesByProducts.filter((x:any) => (x.product?.name).toLowerCase().includes(val));
+    console.log(filteredDevs.length);
+    setDevices(filteredDevs.length?filteredDevs:[]);
+  }
+
   function recordClicked(x:any){
-    sendMessageToParent({record:x});
+    const isEle = (element:any) => element == x;
+    var idx = allDevices.findIndex(isEle);
+    sendMessageToParent({record:x,index:idx});
   }
 
   const sendMessageToParent = (x:any) => {
@@ -50,21 +82,9 @@ function Listgrid({toList,updateList}: listGridProps){
     console.log(x);
   };
 
-  async function loadData(){
-    if(!localStorage.getItem('data')){
-      fetchData();
-    }else{
-      var data = localStorage.getItem('data');
-      var parsedData = data?JSON.parse(data):'';
-      setDevices(parsedData);
-      setAllDevices(parsedData);
-    }
-  }
   async function fetchData(){
-    console.log('LOAD DATA APP');
     var data = await fetch('https://static.ui.com/fingerprint/ui/public.json');
     const res = await data.json();
-    console.log(res);
     localStorage.setItem('data',JSON.stringify(res.devices));
     setDevices(res.devices);
     setAllDevices(res.devices);
@@ -72,6 +92,8 @@ function Listgrid({toList,updateList}: listGridProps){
   return (
     <div id="listgridWrapper">
       <div id="listgridCont">
+      {
+          devices.length?
         <table>
           <tr>
             <th  className="imgtd"></th>
@@ -79,7 +101,6 @@ function Listgrid({toList,updateList}: listGridProps){
             <th className="linetd">Name</th>
           </tr>
           {
-          devices.length?
           devices.map((device:any) =>(
             <tr className="deviceRecord" onClick={e => recordClicked(device)}>
               <td className="imgtd"><img src={'https://static.ui.com/fingerprint/ui/icons/'+(device?.icon?device.icon.id:'')+'_'+(device?.icon?.resolutions?device.icon?.resolutions[0][0]:'')+'x'+(device?.icon?.resolutions?device.icon?.resolutions[0][1]:'')+'.png'}></img></td>
@@ -88,11 +109,12 @@ function Listgrid({toList,updateList}: listGridProps){
               <td className="linetd"><div className="recordName">{device.product.name?device.product.name:'-'}</div> </td>
             </tr>
           ))
-          :
-          ''
           }
         </table>
-        
+
+          :
+          <div className="noneFoundText">No Devices Found</div>
+          }
       </div>
     </div>
   )

@@ -21,24 +21,9 @@ function App() {
   const [lastView, setLastView] = useState<string>('list');
   const [searchValue, setSearchValue] = useState<string>('list');
   const [listData, setListData] = useState('');
+  const [selectedFilter,setSelectedFilter] = useState([]);
 
   useEffect(() => {
-    console.log("loaded");
-    console.log(localStorage.getItem('view'));
-    loadData();
-
-    console.log('APP view',view);
-    if(localStorage.getItem('view')){
-      var localView = localStorage.getItem('view')?localStorage.getItem('view'):'';
-      setView(localView?localView:'');
-      if(localView == 'product' && !record.product){
-        var localRecord = localStorage.getItem('record');
-        var parsedRecord = localRecord?JSON.parse(localRecord):{};
-        setRecord(parsedRecord);
-      }else{
-        console.log('WE HAVE RECORD',record);
-      }
-    }
   });
 
   const fromOption = (message:any) => {
@@ -47,15 +32,19 @@ function App() {
       localStorage.setItem('view',message.view);
       setView(message.view);
     }else if(message.search || message.search === ''){
-      localStorage.setItem('search',message.search);
       setSearchValue(message.search);
-      console.log('searchValue',searchValue);
+    }else if(message.filter  || message.filter.length == 0){
+      setSelectedFilter(message.filter);
+      console.log('FILTER',message.filter);
+      updateListData(message.filter);
+      setSearchValue(searchValue+message.filter.length);
     }
   }
 
   const fromTile = (message:any) => {
     console.log('MESSAGE FROM Tile',message);
     if(message.record){
+      localStorage.setItem('index',message.index);
       localStorage.setItem('lastView',view);
       setLastView('tile');
 
@@ -68,6 +57,7 @@ function App() {
   const fromList = (message:any) => {
     console.log('MESSAGE FROM LIST',message);
     if(message.record){
+      localStorage.setItem('index',message.index);
       localStorage.setItem('lastView',view);
       setLastView('list');
       setView('product');
@@ -118,9 +108,12 @@ function App() {
       <Listgrid toList={fromList} updateList={updateListData}></Listgrid>
       :
       view == 'tile'?
-      <Tilegrid toTile={fromTile}></Tilegrid>
+      <Tilegrid toTile={fromTile} ></Tilegrid>
       :
+      view == 'product'?
       <Productview toProduct={fromProduct}></Productview>
+      :
+      ''
       }
 
     </div>

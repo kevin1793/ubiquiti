@@ -9,9 +9,8 @@
   transition: background .1s;
 }
 #listgridCont{
-  max-height: 800px;
   height: 100%;
-  overflow: scroll;
+  overflow: hidden;
   overflow-x: hidden;
 }
 .imgtd{
