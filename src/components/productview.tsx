@@ -24,20 +24,16 @@ function Productview({toProduct}: ProductviewProps){
   const [jsonDetails, setJsonDetails] = useState('');
   const[index, setIndex] = useState(-1);
   useEffect(() =>{
-    console.log(record);
-    console.log(index);
     if(!record.id){
       var rec = localStorage.getItem('record');
       var parsedRec = rec?JSON.parse(rec):{};
-      console.log('parsedRec',parsedRec);
       setRecord(parsedRec);
       localStorage.setItem('seeJsonDetails','N');
     }
     if(index == -1){
       var idx = localStorage.getItem('index');
-      var parsedIndex = parseInt(idx?idx:'-1');
-      setIndex(parsedIndex?parsedIndex:-1);
-      console.log('parsedIndex',parsedIndex);
+      var parsedIndex:any = parseInt(idx?idx:'-1');
+      setIndex(parsedIndex);
     }
     if(!allRecords.length){
       fetchData();
@@ -58,11 +54,9 @@ function Productview({toProduct}: ProductviewProps){
       localStorage.setItem('seeJsonDetails','N');
       setJsonDetails('');
     }
-    console.log("localStorage.getItem('seeJsonDetails')",localStorage.getItem('seeJsonDetails'));
   }
   const sendMessageToParent = (x:any) => {
     toProduct(x); // Use the appropriate value here
-    console.log(x);
   };
   function backClicked(){
     var message = {click:'back'};
@@ -70,24 +64,29 @@ function Productview({toProduct}: ProductviewProps){
   }
   function nextClicked(){
     var newRec:any;
-    if(index+1 == allRecords.length){
+    var newIdx = index;
+
+    if((newIdx+1 ) == allRecords.length){
       newRec = allRecords[0];
+      setIndex(0);
+
     }else{
-      var newIdx = index+1;
-      newRec = allRecords[newIdx];
+      newRec = allRecords[newIdx+1];
+      setIndex(newIdx+1);
     }
-    setIndex(index+1);
     setRecord(newRec);
   }
 
   function previousClicked(){
     var newRec:any;
-    if(index-1 == -1){
-      newRec = allRecords[0];
+    var newIdx = index;
+    if((newIdx-1) == -1){
+      newRec = allRecords[allRecords.length-1];
+      setIndex(allRecords.length-1);
     }else{
-      newRec = allRecords[index-1];
+      newRec = allRecords[newIdx-1];
+      setIndex(newIdx-1);
     }
-    setIndex(index-1);
     setRecord(newRec);
   }
 

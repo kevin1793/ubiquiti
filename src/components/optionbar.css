@@ -22,14 +22,11 @@
   left: 10px;
   top: 8px;
 }
-
 #optionbarCont div{
   align-self: center;
-
 }
 .optionLeft{
   display: flex;
-  
 }
 .deviceCount{
   font-size: 12px;
@@ -107,4 +104,26 @@ label input{
   cursor: pointer;
   padding-left: 5px;
   font-weight: 600;
+}
+.disabled{
+  cursor:unset;
+  opacity: .4;
+}
+
+@media (max-width:700px){
+  .optionLeft{
+    justify-content: center;
+    width: 100%;
+  }
+  .optionCont{
+    display: block;
+  }
+  .search-bar input{
+    width: 250px;
+    box-shadow: none !important;
+  }
+  .optionRight{
+    margin:0 auto;
+    padding-top: 20px;
+  }
 }

@@ -24,10 +24,13 @@ function App() {
   const [selectedFilter,setSelectedFilter] = useState([]);
 
   useEffect(() => {
+    var localView:any = localStorage.getItem('view');
+    if(localView?.length){
+      setView(localView)
+    }
   });
 
   const fromOption = (message:any) => {
-    console.log('MESSAGE FROM OPTION',message);
     if(message.view){
       localStorage.setItem('view',message.view);
       setView(message.view);
@@ -35,14 +38,12 @@ function App() {
       setSearchValue(message.search);
     }else if(message.filter  || message.filter.length == 0){
       setSelectedFilter(message.filter);
-      console.log('FILTER',message.filter);
       updateListData(message.filter);
       setSearchValue(searchValue+message.filter.length);
     }
   }
 
   const fromTile = (message:any) => {
-    console.log('MESSAGE FROM Tile',message);
     if(message.record){
       localStorage.setItem('index',message.index);
       localStorage.setItem('lastView',view);
@@ -55,7 +56,6 @@ function App() {
   }
 
   const fromList = (message:any) => {
-    console.log('MESSAGE FROM LIST',message);
     if(message.record){
       localStorage.setItem('index',message.index);
       localStorage.setItem('lastView',view);
@@ -70,8 +70,6 @@ function App() {
   };
 
   const fromProduct = (message:any) => {
-    console.log('MESSAGE FROM PRODUCT',message);
-    console.log('klast view',lastView);
     if(message.click == 'back'){
       localStorage.setItem('view',lastView);
       if(lastView == 'product'){
@@ -83,10 +81,8 @@ function App() {
   }
 
   async function loadData(){
-    console.log('LOAD DATA APP');
     var data = await fetch('https://static.ui.com/fingerprint/ui/public.json');
     const res = await data.json();
-    console.log(res);
     localStorage.setItem('data',JSON.stringify(res.devices));
   }
 

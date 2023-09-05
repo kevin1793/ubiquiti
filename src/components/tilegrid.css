@@ -65,3 +65,16 @@
   color: #808080;
   text-align: center;
 }
+
+
+@media (max-width:700px){
+  .tileBox{
+    width: 200px;
+  }
+}
+
+@media (max-width:400px){
+  .tileBox{
+    width: 100%;
+  }
+}

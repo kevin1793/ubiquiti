@@ -1,6 +1,7 @@
 {
   "name": "ubiquiti-fe-test",
   "version": "0.1.0",
+  "homepage": "/ubiquiti",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",

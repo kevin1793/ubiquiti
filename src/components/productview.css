@@ -96,7 +96,7 @@
   text-align: left;
   color: #006fff;
   background: none;
-  padding:5px 1px;
+  padding:5px 5px;
   border: 1px solid #fff;
   border-radius: 5px;
 }
@@ -113,4 +113,24 @@
 }
 .jsonDetailsCont{
   width: 100%;
+}
+
+@media (max-width:700px){
+  #productCont{
+    display: block;
+  }
+  .prodLeft{
+    margin: 0 auto;
+  }
+  .prodRight{
+    margin: 0 auto;
+    padding:15px;
+    padding-top:30px;
+    width: auto;
+  }
+  .jsonDetailsCont {
+    max-width: 600px;
+    margin: 0 auto;
+    padding-bottom: 120px;
+}
 }

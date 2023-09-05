@@ -1,5 +1,6 @@
 import React, { useEffect,useState } from "react";
 import "./../components/tilegrid.css";
+import { parse } from "path";
 
 interface tileGridProps {
   toTile: (message: object) => void;
@@ -7,38 +8,65 @@ interface tileGridProps {
 
 function Tilegrid({toTile}: tileGridProps){
   const [devices, setDevices] = useState([]);
+  const [filteredDevices, setFilteredDevices] = useState([]);
+  const [selectedFilter, setSelectedFilter] = useState([]);
   const [allDevices, setAllDevices] = useState([]);
   const [search, setSearch] = useState('');
-
+  const [init,setInit] = useState('');
   useEffect(() => {
-    console.log('TILEGRID');
-    // call api or anything
-    console.log('TILE GRID DATA?',localStorage.getItem('data'));
-    var localSearch = localStorage.getItem('search');
-
-    if(localSearch?.length){
-      setSearch(localSearch?localSearch:'');
-    }
-    if(allDevices.length && localStorage.getItem('search') != search){
-
-      if(localSearch == ''){
-        setDevices(allDevices);
-        setSearch(localSearch?localSearch:'');
-        return;
-      }
-      var filteredDevices:any = allDevices.filter((x:any) => (x.product?.name).toLowerCase().includes(localSearch));
-      setDevices(filteredDevices.length?filteredDevices:[]);
-      setSearch(localSearch?localSearch:'');
-      console.log('devices length',devices.length);
-    }
+    var localSearch:any = localStorage.getItem('search');
+    var localFilter:any = localStorage.getItem('selectedProductFilter');
+    var localViewChanged:any = localStorage.getItem('viewChanged');
+    var parsedFilter = JSON.parse(localFilter);
     if(!allDevices.length){
-      console.log("loaded");
-      loadData();
+      fetchData();
     }
+    if(allDevices.length && localViewChanged == 'Y'){
+      localStorage.setItem('viewChanged','N');
+      filterData(allDevices,localSearch,parsedFilter);
+    }
+    // SEACHCHANGED
+    if(localSearch != search){
+      if(!localSearch?.length){
+        setFilteredDevices(allDevices);
+      }
+      setSearch(localSearch);
+      filterData(filteredDevices,localSearch,selectedFilter);
+    }
+    // FILTERCHANGED
+    if(parsedFilter?.length == 0 || selectedFilter?.length != parsedFilter?.length){
+      setSelectedFilter(parsedFilter);
+      getFilteredDevices(parsedFilter);
+    }
+    
   });
+  function getFilteredDevices(parsedFilter:any){
+    var filteredDevicesByProducts:any = allDevices;
+    if(parsedFilter?.length){
+      filteredDevicesByProducts = allDevices.filter((x:any) => parsedFilter.includes(x.line.name));
+    }
+    setFilteredDevices(filteredDevicesByProducts);
+    filterData(filteredDevicesByProducts,search,parsedFilter);
+  }
+  function filterData(arr:any,val:any ,filter:any){
+    if(!(filter?.length) && !(val?.length)){
+      setDevices(allDevices);
+      return;
+    }
+    if(!val?.length){
+      var devs = allDevices.filter((x:any) => filter.includes(x.line.name));
+      setDevices(devs);
+      return;
+    }
+    var filteredDevicesByProducts = allDevices;
+    if(filter.length){
+      filteredDevicesByProducts = allDevices.filter((x:any) => filter.includes(x.line.name));
+    }
+    var filteredDevs:any = filteredDevicesByProducts.filter((x:any) => (x.product?.name).toLowerCase().includes(val));
+    setDevices(filteredDevs.length?filteredDevs:[]);
+  }
   const sendMessageToParent = (x:any) => {
     toTile(x); // Use the appropriate value here
-    console.log(x);
   };
 
   async function loadData(){
@@ -57,10 +85,8 @@ function Tilegrid({toTile}: tileGridProps){
     sendMessageToParent({record:device,index:idx});
   }
   async function fetchData(){
-    console.log('LOAD DATA APP');
     var data = await fetch('https://static.ui.com/fingerprint/ui/public.json');
     const res = await data.json();
-    console.log(res);
     localStorage.setItem('data',JSON.stringify(res.devices));
     setDevices(res.devices);
     setAllDevices(res.devices);

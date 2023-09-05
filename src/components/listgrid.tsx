@@ -1,5 +1,6 @@
 import React, { useEffect,useState } from "react";
 import "./../components/listgrid.css"
+import { parse } from "path";
 
 interface listGridProps {
   toList: (message: object) => void;
@@ -16,31 +17,28 @@ function Listgrid({toList,updateList}: listGridProps){
   const [search, setSearch] = useState('');
   useEffect(() => {
     var localSearch:any = localStorage.getItem('search');
-    console.log('===LISRTTGRID======================================');
     var localFilter:any = localStorage.getItem('selectedProductFilter');
     var parsedFilter = JSON.parse(localFilter);
-    console.log('SEARCH',search,localSearch);
-    
-    // console.log('PARSED FILTER',parsedFilter);
-    console.log('alllDevices',allDevices.length);
+    var localViewChanged:any = localStorage.getItem('viewChanged');
+
     if(!allDevices.length){
-      console.log("loaded");
       fetchData();
+    }
+    if(allDevices.length && localViewChanged == 'Y'){
+      localStorage.setItem('viewChanged','N');
+      filterData(allDevices,localSearch,parsedFilter);
     }
     // SEACHCHANGED
     if(localSearch != search){
-      if(!localSearch.length){
+      if(!localSearch?.length){
         setFilteredDevices(allDevices);
       }
-      console.log('localSearch',localSearch);
-      console.log('search',search);
       setSearch(localSearch);
-      filterData(filteredDevices,localSearch);
+      filterData(filteredDevices,localSearch,parsedFilter);
     }
     // FILTERCHANGED
-    if(selectedFilter.length != parsedFilter.length){
+    if((parsedFilter && parsedFilter.length == 0 && selectedFilter.length != parsedFilter.length && selectedFilter && parsedFilter) || (selectedFilter && parsedFilter && selectedFilter.length != parsedFilter.length)){
       setSelectedFilter(parsedFilter);
-      console.log('FILTERCHANGED',parsedFilter,selectedFilter);
       getFilteredDevices(parsedFilter);
     }
   });
@@ -48,26 +46,28 @@ function Listgrid({toList,updateList}: listGridProps){
   function getFilteredDevices(parsedFilter:any){
     var filteredDevicesByProducts:any = allDevices;
     if(parsedFilter?.length){
-      console.log('parsedFilter.length');
       filteredDevicesByProducts = allDevices.filter((x:any) => parsedFilter.includes(x.line.name));
     }
     setFilteredDevices(filteredDevicesByProducts);
-    filterData(filteredDevicesByProducts,search);
+    filterData(filteredDevicesByProducts,search,parsedFilter);
   }
 
-  function filterData(arr:any,val:any){
-    var parsedData:any = selectedFilter;
-    if(!val?.length){
-      console.log('filterData')
-      console.log('SET DEVICES localSearch',devices,filteredDevices);
-      
-      // var filteredDevicesByProducts = allDevices.filter((x:any) => parsedData.includes(x.line.name));
-      setDevices(arr);
+  function filterData(arr:any,val:any ,filter:any){
+    if(!(filter?.length) && !(val?.length)){
+      setDevices(allDevices);
       return;
     }
-    var filteredDevicesByProducts = allDevices.filter((x:any) => parsedData.includes(x.line.name));
+    var parsedData:any = filter;
+    if(!val?.length){
+      var devs = allDevices.filter((x:any) => filter.includes(x.line.name));
+      setDevices(devs);
+      return;
+    }
+    var filteredDevicesByProducts = allDevices;
+    if(parsedData.length){
+      filteredDevicesByProducts = allDevices.filter((x:any) => parsedData.includes(x.line.name));
+    }
     var filteredDevs:any = filteredDevicesByProducts.filter((x:any) => (x.product?.name).toLowerCase().includes(val));
-    console.log(filteredDevs.length);
     setDevices(filteredDevs.length?filteredDevs:[]);
   }
 
@@ -79,14 +79,15 @@ function Listgrid({toList,updateList}: listGridProps){
 
   const sendMessageToParent = (x:any) => {
     toList(x); // Use the appropriate value here
-    console.log(x);
   };
 
   async function fetchData(){
     var data = await fetch('https://static.ui.com/fingerprint/ui/public.json');
     const res = await data.json();
     localStorage.setItem('data',JSON.stringify(res.devices));
-    setDevices(res.devices);
+    // if(localStorage.getItem('viewChanged') == 'N'){
+      setDevices(res.devices);
+    // }
     setAllDevices(res.devices);
   }
   return (

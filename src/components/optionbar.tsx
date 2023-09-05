@@ -19,10 +19,12 @@ function Optionbar({toOption}: OptionbarProps){
   const [productLines,setProductLines] =  useState([]);
   const [selectedProductLines,setSelectedProductLines] =  useState([]);
   useEffect(() =>{
+    var localFilter:any = localStorage.getItem('selectedProductFilter');
+    var parsedFilter = JSON.parse(localFilter);
     if(!allDevices.length){
       setTimeout(function(){
         getLocalData();
-      },1000);
+      },500);
     }
     if(view == ''){
       var localView = localStorage.getItem('view');
@@ -30,6 +32,12 @@ function Optionbar({toOption}: OptionbarProps){
     }
     if(allDevices.length && !productLines.length){
       getProductLines();
+    }
+
+    if((selectedProductLines && parsedFilter && selectedProductLines.length != parsedFilter.length)){
+      setSelectedProductLines(parsedFilter);
+      setFilteredDevices(parsedFilter);
+      filterSearchVal(allDevices,searchVal,parsedFilter);
     }
   });
 
@@ -48,7 +56,6 @@ function Optionbar({toOption}: OptionbarProps){
         prodArr.push(rec.line?.name);
       }
     } 
-    console.log('prodArr',prodArr);
     setProductLines(prodArr);
   }
 
@@ -58,74 +65,102 @@ function Optionbar({toOption}: OptionbarProps){
   };
 
   function viewChanged(x:any){
+    filterSearchVal(allDevices,searchVal,selectedProductLines);
     localStorage.setItem('view',x);
+    localStorage.setItem('viewChanged','Y');
     setView(x);
     sendMessageToParent({view:x});
   }
   function searchChanged(e:any){
     var val:any = e.target.value;
-    console.log('function searchChanged',val)
     localStorage.setItem('search',val);
 
     
     setSearchVal(val);
-    filterSearchVal(val);
+    filterSearchVal(filteredDevices,val,selectedProductLines);
     toOption({search:val});
 
   }
 
-  function filterSearchVal(val:any){
-    console.log(' function filterSearchVal filteredDevices',filteredDevices.length,val);
-    if(val.length>0){
-      var filteredDevs = filteredDevices.filter((x:any) => x.product.name.toLowerCase().includes(val));
-      setDevices(filteredDevs);
-      console.log('filterSearchVal',filteredDevs.length)
-    }
+  function filterSearchVal(arr:any,val:any,selectedProductsFilter:any){
+    var filteredDevs;
+    var filteredDevicesByProducts = allDevices;
+
     if(!val.length){
-      var selectedFilter:any = selectedProductLines;
-      var filteredDevs = allDevices.filter((x:any) => selectedFilter.includes(x.line?.name));
+      if(selectedProductsFilter.length){
+        filteredDevicesByProducts = allDevices.filter((x:any) => selectedProductsFilter.includes(x.line.name));
+      }
+      setDevices(filteredDevicesByProducts);
+      return;
+    }else{
+      if(selectedProductsFilter.length){
+        filteredDevicesByProducts = allDevices.filter((x:any) => selectedProductsFilter.includes(x.line.name));
+      }
+      var filteredDevs:any = filteredDevicesByProducts.filter((x:any) => (x.product?.name).toLowerCase().includes(val));
       setDevices(filteredDevs);
+    }
+  }
+  function setFilterBoxes(){
+    var prods: any = selectedProductLines;
+    var checkBoxes:any = window.document.getElementsByClassName('filterCheckBoxes');
+    for(var i =0;i<checkBoxes.length;i++){
+      var val:string = checkBoxes[i].value?checkBoxes[i].value:'false';
+      if(prods.length && prods.includes(val)){
+        checkBoxes[i].checked = true;
+      }
     }
   }
   function toggleFilter(){
     if(filterToggle == 'N'){
       setFilterToggle('Y');
+      setTimeout(function(){
+        setFilterBoxes()
+      },100);
     }else{
       setFilterToggle('N');
     }
+    
+  }
+  function resetFilters(){
+    localStorage.setItem('selectedProductFilter',JSON.stringify([]));
+    var prodArr:any = [];
+    setSelectedProductLines(prodArr);
+    setFilteredDevices(allDevices);
+    var checkBoxes:any = window.document.getElementsByClassName('filterCheckBoxes');
+    for(var i =0;i<checkBoxes.length;i++){
+      checkBoxes[i].checked = false;
+    }
+    setDevices(allDevices);
+
+    filterSearchVal(allDevices,searchVal,[]);
+    toOption({filter:prodArr});
+    toOption({search:searchVal});
   }
   function checkBoxToggled(e:any){
     toOption({search:searchVal});
-    console.log(e.target.value);
     var val = e.target.value?e.target.value.toString():'';
     var prodArr:any = selectedProductLines;
     if(val.length && prodArr?.includes(val)){
-      console.log('splicing');
       var idx = prodArr.indexOf(val);
       prodArr.splice(idx,1)
       setSelectedProductLines(prodArr);
     }else{
-      console.log('adding');
       prodArr.push(val)
       setSelectedProductLines(prodArr);
     }
-    localStorage.setItem('selectedProductFilter',JSON.stringify(selectedProductLines));
+    localStorage.setItem('selectedProductFilter',JSON.stringify(prodArr));
 
-    if(selectedProductLines.length == 0){
-      console.log('none');
+    if(prodArr.length == 0){
       setFilteredDevices(allDevices);
       setDevices(allDevices);
-      filterSearchVal(searchVal);
+      filterSearchVal(allDevices,searchVal,prodArr);
       toOption({filter:[]});
       return;
     }
-    console.log('selectedProductLines',selectedProductLines);
     var filteredDevices = allDevices.filter((x:any) => prodArr.includes(x.line?.name));
     setFilteredDevices(filteredDevices);
-    filterSearchVal(searchVal);
-    setDevices(filteredDevices);
-    toOption({filter:selectedProductLines});
-
+    filterSearchVal(filteredDevices,searchVal,prodArr);
+    toOption({filter:prodArr});
   }
   return (
     <div id="optionbarWrapper">
@@ -133,34 +168,49 @@ function Optionbar({toOption}: OptionbarProps){
         <div className="optionLeft"> 
           <span className='search-bar'>
               <i className="fa fa-search searchIcon" aria-hidden="true"></i>
-              <input onChange={e=> searchChanged(e)} type="text" placeholder="Search"></input>
-          </span><div className="deviceCount">{devices.length} Devices</div></div>
-          <div className="optionRight">
-            <button><img src={view == 'list'?listViewSelected:listView} onClick={e => viewChanged('list')}></img></button>
-            <button><img src={view == 'tile'?gridViewSelected:gridView}  onClick={e => viewChanged('tile')}></img></button>
-            <div id="filterCont">
-              <button className="filterText" onClick={e=> toggleFilter()}>Filter</button>
-              {filterToggle == 'Y'?
-              <div id="filterDropBox">
-                <div className="filterDropBoxTitle">Product line</div>
-                {
-                  productLines.length?
-                  productLines.map((prod:any) =>(
-                  <label className="dropdown-option">
-                  <input type="checkbox" name="dropdown-group" value={prod} onChange={e=> checkBoxToggled(e)} />
-                    {prod}
-                  </label>
-                  ))
-                  :
-                  ''
-                }
-                <div className="filterDropBoxReset">Reset</div>
-              </div>
+              <input id="deviceSearch" onChange={e=> searchChanged(e)} type="text" placeholder="Search"></input>
+          </span>
+          <div className="deviceCount">
+            {
+              allDevices.length?
+              devices.length+ ' Devices'
               :
-              ''
+
+              'Loading...'
+            }
+          </div>
+        </div>
+        <div className="optionRight">
+          <button><img src={view == 'list'?listViewSelected:listView} onClick={e => viewChanged('list')}></img></button>
+          <button><img src={view == 'tile'?gridViewSelected:gridView}  onClick={e => viewChanged('tile')}></img></button>
+          <div id="filterCont">
+            <button className="filterText" onClick={e=> toggleFilter()}>Filter</button>
+            {filterToggle == 'Y'?
+            <div id="filterDropBox">
+              <div className="filterDropBoxTitle">Product line</div>
+              {
+                productLines.length?
+                productLines.map((prod:any) =>(
+                <label className="dropdown-option">
+                <input type="checkbox" className="filterCheckBoxes" name="dropdown-group" value={prod} onChange={e=> checkBoxToggled(e)} />
+                  {prod}
+                </label>
+                ))
+                :
+                ''
+              }
+              {
+                selectedProductLines.length?
+                <div className="filterDropBoxReset" onClick={e=>{resetFilters()}}>Reset</div>
+                :
+                <div className="filterDropBoxReset disabled">Reset</div>
               }
             </div>
+            :
+            ''
+            }
           </div>
+        </div>
       </div>
     </div>
   )
