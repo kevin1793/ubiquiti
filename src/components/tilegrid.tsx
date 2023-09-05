@@ -34,9 +34,9 @@ function Tilegrid({toTile}: tileGridProps){
       filterData(filteredDevices,localSearch,selectedFilter);
     }
     // FILTERCHANGED
-    if(parsedFilter?.length == 0 || selectedFilter?.length != parsedFilter?.length){
+    if((parsedFilter && parsedFilter.length == 0 && selectedFilter.length != parsedFilter.length && selectedFilter && parsedFilter) || (selectedFilter && parsedFilter && selectedFilter.length != parsedFilter.length)){
       setSelectedFilter(parsedFilter);
-      getFilteredDevices(parsedFilter);
+      filterData(allDevices,search,parsedFilter);
     }
     
   });
@@ -46,24 +46,19 @@ function Tilegrid({toTile}: tileGridProps){
       filteredDevicesByProducts = allDevices.filter((x:any) => parsedFilter.includes(x.line.name));
     }
     setFilteredDevices(filteredDevicesByProducts);
+
     filterData(filteredDevicesByProducts,search,parsedFilter);
   }
   function filterData(arr:any,val:any ,filter:any){
-    if(!(filter?.length) && !(val?.length)){
-      setDevices(allDevices);
-      return;
+    var filteredDevices = allDevices;
+    if(filter?.length){
+      filteredDevices = allDevices.filter((x:any) => filter.includes(x.line.name));
     }
-    if(!val?.length){
-      var devs = allDevices.filter((x:any) => filter.includes(x.line.name));
-      setDevices(devs);
-      return;
+    var searchedDevices = filteredDevices;
+    if(val?.length){
+      searchedDevices = searchedDevices.filter((x:any) => (x.product?.name).toLowerCase().includes(val));
     }
-    var filteredDevicesByProducts = allDevices;
-    if(filter.length){
-      filteredDevicesByProducts = allDevices.filter((x:any) => filter.includes(x.line.name));
-    }
-    var filteredDevs:any = filteredDevicesByProducts.filter((x:any) => (x.product?.name).toLowerCase().includes(val));
-    setDevices(filteredDevs.length?filteredDevs:[]);
+    setDevices(searchedDevices);
   }
   const sendMessageToParent = (x:any) => {
     toTile(x); // Use the appropriate value here
